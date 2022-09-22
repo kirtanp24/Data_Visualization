@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Interactive Visualisation</title>
+    <!-- fetch the D3js library -->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        .tooltip {
+            font-family: "tangerine";
+            pointer-events: none;
+            position: absolute;
+            max-width: 8em;
+            text-align: center;
+            font-size: 20px;
+            background: lightblue;
+        }
+    </style>
+</head>
+
+<body>
+    <h1> <a href="https://www.kaggle.com/datasets/adamschroeder/homelessness?select=Population-by-state.csv">Americans Homeless Problem</a></h1>
+    <div>
+        <p>Select year from slider:</p>
+        <input type="range"
+               min="2010"
+               max="2016"
+               value="1"
+               class="slider"
+               id="myRange">
+        <p>Selected Year: <span id="demo"></span></p>
+    </div>
+    <div class="container"
+         style="display: flex; height: 100px;">
+        <div style="width: 50%; ">
+            <h3>US Population By State</h3>
+            <div id="mapGraph"></div>
+        </div>
+        <div style="flex-grow: 1; ">
+            <div class="container"
+                 style="display: flex; flex-direction: column;">
+                <div>
+                    <h3>County Wise Homeless Stats </h3>
+                    <div id="barGraph"></div>
+                </div>
+                <div style="flex-grow: 1; ">
+                    <h3>Sheltered vs UnSheltered Homeless</h3>
+                    <div id="pieGraph"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="graphs/map.js"></script>
+<script src="graphs/barchart.js"></script>
+<script src="graphs/piechart.js"></script>
+<script>
+    var slider = document.getElementById("myRange");
+    var output = document.getElementById("demo");
+    output.innerHTML = slider.value;
+
+    slider.oninput = function () {
+        output.innerHTML = this.value;
+        d3.csv('data/Population-by-state_cleaned.csv', function (err, data) {
+            var populationForYear = data.map(function (d) {
+                return {
+                    state: d.state,
+                    population: d[output.innerHTML + " population est"]
+                }
+            });
+            DrawMap(populationForYear, output.innerHTML);
+            ClearBar();
+            ClearPie();
+        });
+       
+    }
+    // get data for year 
+    d3.csv('data/Population-by-state_cleaned.csv', function (err, data) {
+        var populationForYear = data.map(function (d) {
+            return {
+                state: d.state,
+                population: d["2010 population est"]
+            }
+        });
+        DrawMap(populationForYear,'2007');
+        DrawBar('AK','2007');
+    })
+</script>
+
+</html>
